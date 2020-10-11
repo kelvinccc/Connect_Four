@@ -6,12 +6,19 @@
   </head>
 
   <body>
-		<div id="transition"></div>
-    <div id="start-container">
-      <img id="title" src="Title.png" alt="title" />
-      <button id="start-button" type="button">Start</button>
+    <div id="transition" style="z-index: -1; opacity: 0;"></div>
+    <div id="start-container" style="display: block; height: auto;">
+      <img
+        id="title"
+        src="title.png"
+        alt="title"
+        style="margin: 40px auto 30px;"
+      />
+      <button id="start-button" type="button" style="display: none;">
+        Start
+      </button>
     </div>
-    <div id="main-container" style="display: none;">
+    <div id="main-container" style="display: flex;">
       <div id="blue-player">
         <img id="blue-player" class="slot" src="tile-blue.png" alt="tile" />
         <span>Blue Player</span>
