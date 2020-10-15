@@ -350,7 +350,7 @@ const gameController = (() => {
         tiles[lrIndex].src = "tile-red.png";
         gameBoard.setTile(lowestRow, col, -1);
       }
-      if (gameBoard.checkWinCondition) {
+      if (gameBoard.checkWinCondition(lowestRow, col, currentPlayer)) {
         console.log("win!");
       }
       currentPlayer *= -1;
