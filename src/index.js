@@ -121,7 +121,7 @@ const gameBoard = (() => {
 
     console.log(`${val} tile set at ${row}, ${col}`);
     _board[row][col] = val;
-    console.log(_board[row][col]);
+    //console.log(_board[row][col]);
   };
 
   /*
@@ -140,7 +140,7 @@ const gameBoard = (() => {
 
     for (let i = _rows - 1; i >= 0; i--) {
       if (getTile(i, col) === 0) {
-        console.log(`lowest row ${i}`);
+        //console.log(`lowest row ${i}`);
         return i;
       }
     }
@@ -169,13 +169,149 @@ const gameBoard = (() => {
     }
   };
 
+  const checkWinCondition = (row, col, player) => {
+    return (
+      _checkRow(row, col, player) ||
+      _checkCol(row, col, player) ||
+      _checkDiagonals(row, col, player)
+    );
+  };
+
+  const _checkRow = (row, col, player) => {
+    let totalCount = 1;
+
+    //Once the first oppoosite player occurence happens, trigger these variables
+    let leftTrigger = false;
+    let rightTrigger = false;
+
+    for (let count = 1; count <= 3; count++) {
+      let tileLeft = getTile(row, col - count);
+      let tileRight = getTile(row, col + count);
+
+      if (tileLeft === null || tileLeft !== player) {
+        //console.log("leftTrigger out of bounds - " + (row - count));
+        leftTrigger = true;
+      } else {
+        //console.log(`${tileLeft} is ${player} - valid`);
+        totalCount++;
+      }
+
+      if (tileRight === null || tileRight !== player) {
+        //console.log("rTrigger out of bounds - " + (row + count));
+        rightTrigger = true;
+      } else {
+        //console.log(`${tileRight} is ${player} - valid`);
+        totalCount++;
+      }
+
+      //console.log(`current count ${totalCount}`);
+
+      if (leftTrigger && rightTrigger) {
+        break;
+      }
+    }
+
+    return totalCount === 4;
+  };
+
+  const _checkCol = (row, col, player) => {
+    let totalCount = 1;
+
+    //Once the first oppoosite player occurence happens, trigger these variables
+    let aboveTrigger = false;
+    let belowTrigger = false;
+
+    for (let count = 1; count <= 3; count++) {
+      let tileAbove = getTile(row - count, col);
+      let tileBelow = getTile(row + count, col);
+
+      if (tileAbove === null || tileAbove !== player) {
+        aboveTrigger = true;
+      } else {
+        totalCount++;
+      }
+
+      if (tileBelow === null || tileBelow !== player) {
+        belowTrigger = true;
+      } else {
+        totalCount++;
+      }
+
+      if (aboveTrigger && belowTrigger) {
+        break;
+      }
+    }
+
+    return totalCount === 4;
+  };
+
+  const _checkDiagonals = (row, col, player) => {
+    let totalCount = 1;
+
+    //Once the first oppoosite player occurence happens, trigger these variables
+    let lUpTrigger = false;
+    let rDownTrigger = false;
+    let lDownTrigger = false;
+    let rUpTrigger = false;
+
+    //Check LUp and RDown diagonals first
+    for (let count = 1; count <= 3; count++) {
+      let tileLUp = getTile(row - count, col - count);
+      let tileRDown = getTile(row + count, col + count);
+
+      if (tileLUp === null || tileLUp !== player) {
+        lUpTrigger = true;
+      } else {
+        totalCount++;
+      }
+
+      if (tileRDown === null || tileRDown !== player) {
+        rDownTrigger = true;
+      } else {
+        totalCount++;
+      }
+
+      if (lUpTrigger && rDownTrigger) {
+        break;
+      }
+    }
+
+    if (totalCount === 4) return true;
+
+    totalCount = 1;
+
+    //Check RUp LDown
+    for (let count = 1; count <= 3; count++) {
+      let tileRUp = getTile(row + count, col + count);
+      let tileLDown = getTile(row - count, col - count);
+
+      if (tileRUp === null || tileRUp !== player) {
+        rUpTrigger = true;
+      } else {
+        totalCount++;
+      }
+
+      if (tileLDown === null || tileLDown !== player) {
+        lDownTrigger = true;
+      } else {
+        totalCount++;
+      }
+
+      if (rUpTrigger && lDownTrigger) {
+        break;
+      }
+    }
+    return totalCount === 4;
+  };
+
   return {
     createBoard,
     clearBoard,
     getTile,
     setTile,
     printBoardState,
-    checkLowestRow
+    checkLowestRow,
+    checkWinCondition
   };
 })();
 
@@ -206,7 +342,6 @@ const gameController = (() => {
     const lowestRow = gameBoard.checkLowestRow(col);
     const lrIndex = _cols * lowestRow + col;
 
-    console.log(`lrIndex ${lrIndex}`);
     if (tile !== null && tile === 0 && lowestRow !== -1) {
       if (currentPlayer === 1) {
         tiles[lrIndex].src = "tile-blue.png";
@@ -214,6 +349,9 @@ const gameController = (() => {
       } else {
         tiles[lrIndex].src = "tile-red.png";
         gameBoard.setTile(lowestRow, col, -1);
+      }
+      if (gameBoard.checkWinCondition) {
+        console.log("win!");
       }
       currentPlayer *= -1;
     } else {
