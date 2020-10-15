@@ -70,12 +70,12 @@ const gameBoard = (() => {
     let error = true;
 
     if (row >= _rows || row < 0) {
-      console.log(`Row index out of bounds, must be between 1 - ${_rows}`);
+      //console.log(`Row index out of bounds, must be between 1 - ${_rows}`);
       error = false;
     }
 
     if (col >= _cols || col < 0) {
-      console.log(`Column index out of bounds, must be between 1 - ${_cols}`);
+      //console.log(`Column index out of bounds, must be between 1 - ${_cols}`);
       error = false;
     }
 
@@ -276,14 +276,18 @@ const gameBoard = (() => {
       }
     }
 
+    console.log(totalCount);
+
     if (totalCount === 4) return true;
 
     totalCount = 1;
 
     //Check RUp LDown
     for (let count = 1; count <= 3; count++) {
-      let tileRUp = getTile(row + count, col + count);
-      let tileLDown = getTile(row - count, col - count);
+      let tileRUp = getTile(row - count, col + count);
+      let tileLDown = getTile(row + count, col - count);
+      //console.log(`${row - count}, ${col + count}: Rup ${tileRUp}`);
+      //console.log(`${row + count}, ${col - count}: LD ${tileLDown}`);
 
       if (tileRUp === null || tileRUp !== player) {
         rUpTrigger = true;
@@ -301,6 +305,7 @@ const gameBoard = (() => {
         break;
       }
     }
+    console.log(totalCount);
     return totalCount === 4;
   };
 
