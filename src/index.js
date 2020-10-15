@@ -170,3 +170,29 @@ console.log(gameBoard.printBoardState());
 gameBoard.createBoard(3, 3);
 console.log(gameBoard.printBoardState());
 */
+
+const gameController = (() => {
+  let tiles = document.querySelectorAll(".slot");
+  let currentPlayer = -1;
+  //let board = gameBoard.createBoard(6, 7);
+
+  const tileOnclick = (i) => {
+    if (currentPlayer === 1) {
+      tiles[i].src = "tile-blue.png";
+    } else {
+      tiles[i].src = "tile-red.png";
+    }
+  };
+
+  const initTileOnclick = () => {
+    for (let i = 0; i < tiles.length; i++) {
+      let tile = tiles[i];
+      tiles[i].addEventListener("click", tileOnclick.bind(tile, i));
+    }
+  };
+
+  const placePiece = (player, row, col) => {};
+  return { initTileOnclick };
+})();
+
+gameController.initTileOnclick();
