@@ -69,12 +69,12 @@ const gameBoard = (() => {
   const _checkBounds = (row, col) => {
     let error = true;
 
-    if (row > _rows || row < 0) {
+    if (row >= _rows || row < 0) {
       console.log(`Row index out of bounds, must be between 1 - ${_rows}`);
       error = false;
     }
 
-    if (col > _cols || col < 0) {
+    if (col >= _cols || col < 0) {
       console.log(`Column index out of bounds, must be between 1 - ${_cols}`);
       error = false;
     }
@@ -132,6 +132,23 @@ const gameBoard = (() => {
     return !_checkBounds(row, col) ? null : _board[row][col];
   };
 
+  const checkLowestRow = (col) => {
+    if (!_checkBounds(0, col)) {
+      console.log("checkLowestRow() returning null");
+      return null;
+    }
+
+    for (let i = _rows - 1; i >= 0; i--) {
+      if (getTile(i, col) === 0) {
+        console.log(`lowest row ${i}`);
+        return i;
+      }
+    }
+
+    console.log(`rows filled completely`);
+    return -1;
+  };
+
   /*
   Prints the current state of the board.
     Note: if !boardCreated then returns informative message
@@ -157,7 +174,8 @@ const gameBoard = (() => {
     clearBoard,
     getTile,
     setTile,
-    printBoardState
+    printBoardState,
+    checkLowestRow
   };
 })();
 
@@ -177,38 +195,39 @@ console.log(gameBoard.printBoardState());
 const gameController = (() => {
   let tiles = document.querySelectorAll(".slot");
   let currentPlayer = -1;
-  gameBoard.createBoard(6, 7);
   const _rows = 6;
   const _cols = 7;
+  gameBoard.createBoard(_rows, _cols);
 
-  const tileOnclick = (i) => {
-    console.log(i);
+  const _tileOnclick = (i) => {
     const row = Math.floor(i / _cols);
     const col = i % _cols;
     const tile = gameBoard.getTile(row, col);
-    if (tile !== null && tile === 0) {
-      //console.log("tile fill");
+    const lowestRow = gameBoard.checkLowestRow(col);
+    const lrIndex = _cols * lowestRow + col;
+
+    console.log(`lrIndex ${lrIndex}`);
+    if (tile !== null && tile === 0 && lowestRow !== -1) {
       if (currentPlayer === 1) {
-        tiles[i].src = "tile-blue.png";
-        gameBoard.setTile(row, col, 1);
+        tiles[lrIndex].src = "tile-blue.png";
+        gameBoard.setTile(lowestRow, col, 1);
       } else {
-        tiles[i].src = "tile-red.png";
-        gameBoard.setTile(row, col, -1);
+        tiles[lrIndex].src = "tile-red.png";
+        gameBoard.setTile(lowestRow, col, -1);
       }
+      currentPlayer *= -1;
     } else {
       console.log("tile filled already");
     }
   };
 
-  const initTileOnclick = () => {
+  const _initTileOnclick = () => {
     for (let i = 0; i < tiles.length; i++) {
       let tile = tiles[i];
-      tiles[i].addEventListener("click", tileOnclick.bind(tile, i));
+      tiles[i].addEventListener("click", _tileOnclick.bind(tile, i));
     }
   };
 
+  _initTileOnclick();
   const placePiece = (player, row, col) => {};
-  return { initTileOnclick };
 })();
-
-gameController.initTileOnclick();
