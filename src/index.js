@@ -65,18 +65,18 @@ const gameBoard = (() => {
     return typeof _board !== "undefined";
   };
 
-  //Check bounds of board, return true false
+  //Check bounds of board, return true if pass false if fail
   const _checkBounds = (row, col) => {
-    let error = false;
+    let error = true;
 
-    if (row > _rows || row <= 0) {
+    if (row > _rows || row < 0) {
       console.log(`Row index out of bounds, must be between 1 - ${_rows}`);
-      error = true;
+      error = false;
     }
 
-    if (col > _cols || col <= 0) {
+    if (col > _cols || col < 0) {
       console.log(`Column index out of bounds, must be between 1 - ${_cols}`);
-      error = true;
+      error = false;
     }
 
     return error;
@@ -114,11 +114,14 @@ const gameBoard = (() => {
   val should be -1, 0, or 1
 */
   const setTile = (row, col, val) => {
-    if (!_checkBounds()) {
+    if (!_checkBounds(row, col)) {
+      console.log("setTile() returning null");
       return null;
     }
 
+    console.log(`${val} tile set at ${row}, ${col}`);
     _board[row][col] = val;
+    console.log(_board[row][col]);
   };
 
   /*
@@ -126,7 +129,7 @@ const gameBoard = (() => {
     If row or col is out of bounds, returns null
   */
   const getTile = (row, col) => {
-    return _checkBounds() ? null : _board[row][col];
+    return !_checkBounds(row, col) ? null : _board[row][col];
   };
 
   /*
@@ -174,13 +177,26 @@ console.log(gameBoard.printBoardState());
 const gameController = (() => {
   let tiles = document.querySelectorAll(".slot");
   let currentPlayer = -1;
-  //let board = gameBoard.createBoard(6, 7);
+  gameBoard.createBoard(6, 7);
+  const _rows = 6;
+  const _cols = 7;
 
   const tileOnclick = (i) => {
-    if (currentPlayer === 1) {
-      tiles[i].src = "tile-blue.png";
+    console.log(i);
+    const row = Math.floor(i / _cols);
+    const col = i % _cols;
+    const tile = gameBoard.getTile(row, col);
+    if (tile !== null && tile === 0) {
+      //console.log("tile fill");
+      if (currentPlayer === 1) {
+        tiles[i].src = "tile-blue.png";
+        gameBoard.setTile(row, col, 1);
+      } else {
+        tiles[i].src = "tile-red.png";
+        gameBoard.setTile(row, col, -1);
+      }
     } else {
-      tiles[i].src = "tile-red.png";
+      console.log("tile filled already");
     }
   };
 
